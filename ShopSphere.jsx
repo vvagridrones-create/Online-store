@@ -249,39 +249,83 @@ function Navbar({ darkMode, setDarkMode, page, setPage, cart, searchQuery, setSe
 
   return (
     <nav style={{ position: "sticky", top: 0, zIndex: 1000, background: bg, borderBottom: `1px solid ${borderColor}`, boxShadow: "0 2px 20px rgba(0,0,0,0.08)" }}>
-      <div style={{ background: COLORS.primary, padding: "4px 20px", fontSize: 12, color: "#fff", textAlign: "center", fontWeight: 500 }}>
+      <style>{`
+        .navbar-row { display: flex; align-items: center; padding: 10px 16px; gap: 12px; max-width: 1400px; margin: 0 auto; box-sizing: border-box; width: 100%; }
+        .navbar-logo span.logo-text { font-size: 20px; }
+        .navbar-search { flex: 1; min-width: 0; position: relative; }
+        .navbar-search input { width: 100%; padding: 9px 40px 9px 14px; border-radius: 10px; border: 1.5px solid ${COLORS.primary}; background: ${darkMode ? "rgba(255,255,255,0.05)" : "#F8F9FF"}; color: ${textColor}; font-size: 13px; box-sizing: border-box; outline: none; }
+        .navbar-search button { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); background: ${COLORS.primary}; border: none; border-radius: 7px; padding: 4px 9px; cursor: pointer; font-size: 14px; }
+        .navbar-actions { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
+        .nav-action-btn { background: transparent; border: none; border-radius: 8px; padding: 5px 8px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 2px; transition: background 0.2s; }
+        .nav-action-btn:hover { background: rgba(255,107,53,0.1); }
+        .nav-action-btn .btn-icon { font-size: 17px; }
+        .nav-action-btn .btn-label { font-size: 9px; color: ${textColor}; font-weight: 500; white-space: nowrap; }
+        .nav-action-btn:hover .btn-label { color: ${COLORS.primary}; }
+        .cats-bar { border-top: 1px solid ${borderColor}; display: flex; gap: 0; overflow-x: auto; scrollbar-width: none; -ms-overflow-style: none; }
+        .cats-bar::-webkit-scrollbar { display: none; }
+        .cats-bar-inner { display: flex; gap: 4px; padding: 6px 16px; max-width: 1400px; margin: 0 auto; width: 100%; box-sizing: border-box; }
+        .cat-btn { background: none; border: none; color: ${textColor}; font-size: 12px; cursor: pointer; white-space: nowrap; padding: 3px 8px; border-radius: 6px; display: flex; align-items: center; gap: 3px; font-weight: 500; transition: all 0.15s; }
+        .cat-btn:hover { background: rgba(255,107,53,0.1); color: ${COLORS.primary}; }
+        .promo-bar { background: ${COLORS.primary}; padding: 4px 16px; font-size: 11px; color: #fff; text-align: center; font-weight: 500; }
+      `}</style>
+
+      <div className="promo-bar">
         🎉 MEGA SALE: Free shipping on orders above ₹499 | Use code <strong>SPHERE20</strong> for 20% off!
       </div>
-      <div style={{ display: "flex", alignItems: "center", padding: "12px 20px", gap: 16, maxWidth: 1400, margin: "0 auto" }}>
-        <div onClick={() => setPage("home")} style={{ cursor: "pointer", display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
-          <div style={{ width: 32, height: 32, background: COLORS.primary, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, fontWeight: 900 }}>🛍</div>
-          <span style={{ fontSize: 22, fontWeight: 800, color: COLORS.primary, fontFamily: "Georgia, serif", letterSpacing: "-0.5px" }}>Shop<span style={{ color: textColor }}>Sphere</span></span>
+
+      <div className="navbar-row">
+        <div className="navbar-logo" onClick={() => setPage("home")} style={{ cursor: "pointer", display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
+          <div style={{ width: 30, height: 30, background: COLORS.primary, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16 }}>🛍</div>
+          <span style={{ fontSize: 19, fontWeight: 800, color: COLORS.primary, fontFamily: "Georgia, serif", letterSpacing: "-0.5px", whiteSpace: "nowrap" }}>
+            Shop<span style={{ color: textColor }}>Sphere</span>
+          </span>
         </div>
-        <div style={{ flex: 1, position: "relative", maxWidth: 600 }}>
-          <input value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} onKeyPress={(e) => e.key === "Enter" && setPage("products")}
-            placeholder="Search for products, brands, categories..."
-            style={{ width: "100%", padding: "10px 44px 10px 16px", borderRadius: 10, border: `1.5px solid ${COLORS.primary}`, background: darkMode ? "rgba(255,255,255,0.05)" : "#F8F9FF", color: textColor, fontSize: 14, boxSizing: "border-box", outline: "none" }} />
-          <button onClick={() => setPage("products")} style={{ position: "absolute", right: 8, top: "50%", transform: "translateY(-50%)", background: COLORS.primary, border: "none", borderRadius: 7, padding: "5px 10px", cursor: "pointer", fontSize: 16 }}>🔍</button>
+
+        <div className="navbar-search">
+          <input
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            onKeyPress={(e) => e.key === "Enter" && setPage("products")}
+            placeholder="Search products, brands..."
+          />
+          <button onClick={() => setPage("products")}>🔍</button>
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <NavBtn icon="🌙" label={darkMode ? "Light" : "Dark"} onClick={() => setDarkMode(!darkMode)} textColor={textColor} />
-          <NavBtn icon="❤️" label="Wishlist" onClick={() => setPage("wishlist")} textColor={textColor} />
+
+        <div className="navbar-actions">
+          <button className="nav-action-btn" onClick={() => setDarkMode(!darkMode)}>
+            <span className="btn-icon">{darkMode ? "☀️" : "🌙"}</span>
+            <span className="btn-label">{darkMode ? "Light" : "Dark"}</span>
+          </button>
+          <button className="nav-action-btn" onClick={() => setPage("wishlist")}>
+            <span className="btn-icon">❤️</span>
+            <span className="btn-label">Wishlist</span>
+          </button>
           <div style={{ position: "relative" }}>
-            <NavBtn icon="🛒" label="Cart" onClick={() => setPage("cart")} textColor={textColor} />
+            <button className="nav-action-btn" onClick={() => setPage("cart")}>
+              <span className="btn-icon">🛒</span>
+              <span className="btn-label">Cart</span>
+            </button>
             {cart.length > 0 && (
-              <span style={{ position: "absolute", top: -4, right: -4, background: COLORS.danger, color: "#fff", borderRadius: "50%", width: 18, height: 18, fontSize: 10, fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center" }}>{cart.reduce((a, b) => a + b.qty, 0)}</span>
+              <span style={{ position: "absolute", top: -2, right: -2, background: COLORS.danger, color: "#fff", borderRadius: "50%", width: 17, height: 17, fontSize: 9, fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center", pointerEvents: "none" }}>
+                {cart.reduce((a, b) => a + b.qty, 0)}
+              </span>
             )}
           </div>
-          <NavBtn icon="👤" label={user ? "Account" : "Sign In"} onClick={() => setPage(user ? "dashboard" : "auth")} textColor={textColor} />
+          <button className="nav-action-btn" onClick={() => setPage(user ? "dashboard" : "auth")}>
+            <span className="btn-icon">👤</span>
+            <span className="btn-label">{user ? "Account" : "Sign In"}</span>
+          </button>
         </div>
       </div>
-      <div style={{ borderTop: `1px solid ${borderColor}`, padding: "8px 20px", display: "flex", gap: 20, overflowX: "auto", maxWidth: 1400, margin: "0 auto" }}>
-        {DEFAULT_CATEGORIES.slice(0, 10).map((cat) => (
-          <button key={cat.id} onClick={() => { setSearchQuery(cat.name); setPage("products"); }}
-            style={{ background: "none", border: "none", color: textColor, fontSize: 13, cursor: "pointer", whiteSpace: "nowrap", padding: "2px 0", display: "flex", alignItems: "center", gap: 4, fontWeight: 500 }}>
-            <span>{cat.icon}</span> {cat.name}
-          </button>
-        ))}
+
+      <div className="cats-bar">
+        <div className="cats-bar-inner">
+          {DEFAULT_CATEGORIES.slice(0, 10).map((cat) => (
+            <button key={cat.id} className="cat-btn" onClick={() => { setSearchQuery(cat.name); setPage("products"); }}>
+              <span>{cat.icon}</span>{cat.name}
+            </button>
+          ))}
+        </div>
       </div>
     </nav>
   );
@@ -799,126 +843,333 @@ function CartPage({ darkMode, cart, setCart, setPage }) {
 
 function CheckoutPage({ darkMode, cart, setCart, setPage, user, onPlaceOrder }) {
   const [step, setStep] = useState(1);
-  const [paymentMethod, setPaymentMethod] = useState("card");
+  const [paymentMethod, setPaymentMethod] = useState("");       // "", "card", "upi", "cod"
+  const [cardType, setCardType] = useState("");                 // "credit" | "debit"
+  const [cardDetails, setCardDetails] = useState({ number: "", expiry: "", cvv: "", name: "" });
+  const [upiApp, setUpiApp] = useState("");                     // "gpay" | "phonepe" | "paytm" | "bhim"
+  const [upiState, setUpiState] = useState("idle");            // "idle" | "redirecting" | "waiting" | "success" | "failed"
   const [placed, setPlaced] = useState(false);
+  const [orderStatus, setOrderStatus] = useState("Confirmed"); // "Confirmed" | "Cancelled"
   const [placing, setPlacing] = useState(false);
   const [orderId, setOrderId] = useState(null);
-  const [address, setAddress] = useState({ firstName: "", lastName: "", email: user?.email || "", phone: "", address: "", city: "", state: "", pincode: "" });
+  const [addrErrors, setAddrErrors] = useState({});
+  const [cardErrors, setCardErrors] = useState({});
+  const [address, setAddress] = useState({
+    firstName: "", lastName: "", email: user?.email || "",
+    phone: "", address: "", city: "", state: "", pincode: ""
+  });
 
   const bg = darkMode ? COLORS.dark : COLORS.lightBg;
   const textColor = darkMode ? "#E8E8F0" : "#1A1A2E";
   const mutedColor = darkMode ? "#9090AA" : "#666";
   const cardBg = darkMode ? COLORS.darkCard : COLORS.lightCard;
   const borderColor = darkMode ? COLORS.darkBorder : COLORS.lightBorder;
-  const total = cart.reduce((s, i) => s + i.price * i.qty, 0);
 
-  const handlePlaceOrder = async () => {
+  const subtotal = cart.reduce((s, i) => s + i.price * i.qty, 0);
+  const codFee = paymentMethod === "cod" ? 15 : 0;
+  const total = subtotal + codFee;
+
+  const inputStyle = {
+    width: "100%", padding: "10px 12px", borderRadius: 8,
+    border: `1px solid ${borderColor}`,
+    background: darkMode ? "rgba(255,255,255,0.05)" : "#fff",
+    color: textColor, fontSize: 14, boxSizing: "border-box", outline: "none"
+  };
+  const errStyle = { color: COLORS.danger, fontSize: 11, marginTop: 3 };
+
+  // ── Step 1: validate address ──
+  const validateAddress = () => {
+    const errs = {};
+    const fields = ["firstName", "lastName", "email", "phone", "address", "city", "state", "pincode"];
+    fields.forEach(f => { if (!address[f]?.trim()) errs[f] = "Required"; });
+    if (address.email && !/\S+@\S+\.\S+/.test(address.email)) errs.email = "Invalid email";
+    if (address.phone && !/^\d{10}$/.test(address.phone.replace(/\s/g, ""))) errs.phone = "10-digit number required";
+    if (address.pincode && !/^\d{6}$/.test(address.pincode)) errs.pincode = "6-digit pincode required";
+    setAddrErrors(errs);
+    return Object.keys(errs).length === 0;
+  };
+
+  const goToPayment = () => { if (validateAddress()) setStep(2); };
+
+  // ── Step 2: validate payment selection + card details ──
+  const validatePayment = () => {
+    if (!paymentMethod) return false;
+    if (paymentMethod === "card") {
+      if (!cardType) return false;
+      const errs = {};
+      if (!cardDetails.name.trim()) errs.name = "Name on card required";
+      if (!/^\d{16}$/.test(cardDetails.number.replace(/\s/g, ""))) errs.number = "Valid 16-digit card number required";
+      if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(cardDetails.expiry)) errs.expiry = "Format MM/YY";
+      if (!/^\d{3,4}$/.test(cardDetails.cvv)) errs.cvv = "3 or 4 digits";
+      setCardErrors(errs);
+      return Object.keys(errs).length === 0;
+    }
+    return true;
+  };
+
+  const goToReview = () => { if (validatePayment()) setStep(3); };
+
+  // ── UPI redirect simulation ──
+  const handleUpiPay = () => {
+    if (!upiApp) return;
+    const appUrls = {
+      gpay: "tez://upi/pay",
+      phonepe: "phonepe://pay",
+      paytm: "paytmmp://pay",
+      bhim: "upi://pay",
+    };
+    setUpiState("redirecting");
+    // Simulate opening app
+    const link = document.createElement("a");
+    link.href = `${appUrls[upiApp]}?pa=shopsphere@upi&pn=ShopSphere&am=${total}&cu=INR&tn=Order`;
+    link.click();
+    setTimeout(() => setUpiState("waiting"), 1500);
+  };
+
+  const confirmUpiPayment = (success) => {
+    setUpiState(success ? "success" : "failed");
+    if (success) setTimeout(() => handlePlaceOrder(true), 800);
+  };
+
+  // ── Place order ──
+  const handlePlaceOrder = async (paymentConfirmed = false) => {
+    if (paymentMethod === "upi" && !paymentConfirmed) { handleUpiPay(); return; }
     setPlacing(true);
+    const status = paymentMethod === "upi" ? (paymentConfirmed ? "Confirmed" : "Cancelled") : "Processing";
     try {
       const generatedId = `ORD-${Date.now()}`;
       await onPlaceOrder({
         order_id: generatedId,
         user_email: address.email || "guest@shopsphere.in",
         total,
-        status: "Processing",
+        status,
         payment_method: paymentMethod,
         items: cart.map(i => ({ id: i.id, name: i.name, qty: i.qty, price: i.price })),
         shipping_address: address,
         created_at: new Date().toISOString(),
       });
       setOrderId(generatedId);
+      setOrderStatus(status === "Cancelled" ? "Cancelled" : "Confirmed");
       setPlaced(true);
       setCart([]);
     } catch (e) {
-      console.error("Order placement failed:", e);
-      // Still show success to user (offline fallback)
       const generatedId = `ORD-${Date.now()}`;
       setOrderId(generatedId);
+      setOrderStatus(paymentMethod === "upi" && !paymentConfirmed ? "Cancelled" : "Confirmed");
       setPlaced(true);
       setCart([]);
     }
     setPlacing(false);
   };
 
+  // ── Order result screen ──
   if (placed) return (
-    <div style={{ background: bg, minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 16, textAlign: "center" }}>
-      <div style={{ fontSize: 80 }}>🎉</div>
-      <h1 style={{ color: COLORS.success, fontSize: 32, fontWeight: 900 }}>Order Placed Successfully!</h1>
-      <p style={{ color: textColor, fontSize: 18 }}>Your order #{orderId} has been confirmed</p>
-      <p style={{ color: mutedColor }}>Estimated delivery: <strong>Tomorrow, 10 PM</strong></p>
+    <div style={{ background: bg, minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 16, textAlign: "center", padding: 20 }}>
+      <div style={{ fontSize: 80 }}>{orderStatus === "Cancelled" ? "❌" : "🎉"}</div>
+      <h1 style={{ color: orderStatus === "Cancelled" ? COLORS.danger : COLORS.success, fontSize: 28, fontWeight: 900 }}>
+        {orderStatus === "Cancelled" ? "Order Cancelled" : "Order Confirmed!"}
+      </h1>
+      <p style={{ color: textColor, fontSize: 17 }}>Order #{orderId}</p>
+      <p style={{ color: mutedColor, maxWidth: 400 }}>
+        {orderStatus === "Cancelled"
+          ? "Payment was not completed. Your order has been cancelled. No charges were made."
+          : `Payment successful! Estimated delivery: Tomorrow, 10 PM`}
+      </p>
       <div style={{ display: "flex", gap: 12, marginTop: 8 }}>
         <button onClick={() => setPage("home")} style={{ background: COLORS.primary, color: "#fff", border: "none", padding: "12px 28px", borderRadius: 10, fontWeight: 700, cursor: "pointer" }}>Continue Shopping</button>
-        <button onClick={() => setPage("dashboard")} style={{ background: "none", border: `1px solid ${COLORS.primary}`, color: COLORS.primary, padding: "12px 28px", borderRadius: 10, fontWeight: 700, cursor: "pointer" }}>Track Order</button>
+        {orderStatus !== "Cancelled" && <button onClick={() => setPage("dashboard")} style={{ background: "none", border: `1px solid ${COLORS.primary}`, color: COLORS.primary, padding: "12px 28px", borderRadius: 10, fontWeight: 700, cursor: "pointer" }}>Track Order</button>}
       </div>
+    </div>
+  );
+
+  const StepDot = ({ n, label }) => (
+    <div style={{ display: "flex", alignItems: "center", flex: 1 }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+        <div style={{ width: 28, height: 28, borderRadius: "50%", background: n <= step ? COLORS.primary : borderColor, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 700 }}>{n < step ? "✓" : n}</div>
+        <span style={{ fontSize: 13, color: n <= step ? textColor : mutedColor, fontWeight: n === step ? 700 : 400 }}>{label}</span>
+      </div>
+      {n < 3 && <div style={{ flex: 1, height: 1.5, background: n < step ? COLORS.primary : borderColor, margin: "0 10px" }} />}
+    </div>
+  );
+
+  const Field = ({ label, fkey, type = "text", half, error }) => (
+    <div style={{ gridColumn: half ? "auto" : "1 / -1" }}>
+      <label style={{ fontSize: 12, color: error ? COLORS.danger : mutedColor, display: "block", marginBottom: 4 }}>{label}{" "}<span style={{ color: COLORS.danger }}>*</span></label>
+      <input type={type} value={address[fkey]} onChange={(e) => { setAddress(a => ({ ...a, [fkey]: e.target.value })); setAddrErrors(e => ({ ...e, [fkey]: "" })); }}
+        style={{ ...inputStyle, borderColor: error ? COLORS.danger : borderColor }} />
+      {error && <p style={errStyle}>{error}</p>}
+    </div>
+  );
+
+  const RadioOpt = ({ val, label, selected, onClick }) => (
+    <div onClick={onClick} style={{ border: `1.5px solid ${selected ? COLORS.primary : borderColor}`, borderRadius: 10, padding: "12px 16px", marginBottom: 10, cursor: "pointer", display: "flex", alignItems: "center", gap: 10, background: selected ? "rgba(255,107,53,0.05)" : "transparent", transition: "all 0.15s" }}>
+      <div style={{ width: 18, height: 18, borderRadius: "50%", border: `2px solid ${selected ? COLORS.primary : borderColor}`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+        {selected && <div style={{ width: 8, height: 8, borderRadius: "50%", background: COLORS.primary }} />}
+      </div>
+      <span style={{ color: textColor, fontSize: 14 }}>{label}</span>
     </div>
   );
 
   return (
     <div style={{ background: bg, minHeight: "100vh", padding: 20 }}>
       <div style={{ maxWidth: 900, margin: "0 auto" }}>
-        <h2 style={{ color: textColor, marginBottom: 20 }}>Checkout</h2>
+        <h2 style={{ color: textColor, marginBottom: 20, fontWeight: 800 }}>Checkout</h2>
+
+        {/* Step indicator */}
         <div style={{ display: "flex", alignItems: "center", marginBottom: 28 }}>
-          {["Delivery", "Payment", "Review"].map((s, i) => (
-            <div key={s} style={{ display: "flex", alignItems: "center", flex: 1 }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <div style={{ width: 28, height: 28, borderRadius: "50%", background: i + 1 <= step ? COLORS.primary : borderColor, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 700 }}>{i + 1}</div>
-                <span style={{ fontSize: 13, color: i + 1 <= step ? textColor : mutedColor, fontWeight: i + 1 === step ? 700 : 400 }}>{s}</span>
-              </div>
-              {i < 2 && <div style={{ flex: 1, height: 1.5, background: i + 1 < step ? COLORS.primary : borderColor, margin: "0 10px" }} />}
-            </div>
-          ))}
+          <StepDot n={1} label="Delivery" />
+          <StepDot n={2} label="Payment" />
+          <StepDot n={3} label="Review" />
         </div>
 
         <div style={{ display: "grid", gridTemplateColumns: "1fr 300px", gap: 20 }}>
           <div style={{ background: cardBg, border: `1px solid ${borderColor}`, borderRadius: 16, padding: 24 }}>
+
+            {/* ── STEP 1: DELIVERY ADDRESS ── */}
             {step === 1 && (
               <div>
-                <h3 style={{ color: textColor, marginBottom: 16 }}>Delivery Address</h3>
+                <h3 style={{ color: textColor, marginBottom: 16 }}>📍 Delivery Address</h3>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-                  {[["First Name", "firstName", "text"], ["Last Name", "lastName", "text"], ["Email", "email", "email"], ["Phone", "phone", "tel"], ["Address", "address", "text"], ["City", "city", "text"], ["State", "state", "text"], ["Pincode", "pincode", "text"]].map(([label, key, type]) => (
-                    <div key={key} style={{ gridColumn: key === "address" ? "1 / -1" : "auto" }}>
-                      <label style={{ fontSize: 12, color: mutedColor, display: "block", marginBottom: 4 }}>{label}</label>
-                      <input type={type} value={address[key]} onChange={(e) => setAddress(a => ({ ...a, [key]: e.target.value }))}
-                        style={{ width: "100%", padding: "10px 12px", borderRadius: 8, border: `1px solid ${borderColor}`, background: darkMode ? "rgba(255,255,255,0.05)" : "#fff", color: textColor, fontSize: 14, boxSizing: "border-box", outline: "none" }} />
-                    </div>
-                  ))}
+                  <Field label="First Name" fkey="firstName" half error={addrErrors.firstName} />
+                  <Field label="Last Name" fkey="lastName" half error={addrErrors.lastName} />
+                  <Field label="Email" fkey="email" type="email" half error={addrErrors.email} />
+                  <Field label="Phone" fkey="phone" type="tel" half error={addrErrors.phone} />
+                  <Field label="Address" fkey="address" error={addrErrors.address} />
+                  <Field label="City" fkey="city" half error={addrErrors.city} />
+                  <Field label="State" fkey="state" half error={addrErrors.state} />
+                  <Field label="Pincode" fkey="pincode" half error={addrErrors.pincode} />
                 </div>
-                <button onClick={() => setStep(2)} style={{ marginTop: 20, background: COLORS.primary, color: "#fff", border: "none", padding: "12px 32px", borderRadius: 10, fontWeight: 700, cursor: "pointer", fontSize: 15 }}>Continue to Payment →</button>
+                <button onClick={goToPayment}
+                  style={{ marginTop: 20, background: COLORS.primary, color: "#fff", border: "none", padding: "12px 32px", borderRadius: 10, fontWeight: 700, cursor: "pointer", fontSize: 15 }}>
+                  Continue to Payment →
+                </button>
               </div>
             )}
+
+            {/* ── STEP 2: PAYMENT METHOD ── */}
             {step === 2 && (
               <div>
-                <h3 style={{ color: textColor, marginBottom: 16 }}>Payment Method</h3>
-                {[["card", "💳 Credit / Debit Card"], ["upi", "🔷 UPI (GPay, PhonePe, Paytm)"], ["cod", "💵 Cash on Delivery"], ["emi", "📅 EMI Options"]].map(([val, label]) => (
-                  <div key={val} onClick={() => setPaymentMethod(val)}
-                    style={{ border: `1.5px solid ${paymentMethod === val ? COLORS.primary : borderColor}`, borderRadius: 10, padding: "12px 16px", marginBottom: 10, cursor: "pointer", display: "flex", alignItems: "center", gap: 10, background: paymentMethod === val ? "rgba(255,107,53,0.05)" : "transparent" }}>
-                    <div style={{ width: 18, height: 18, borderRadius: "50%", border: `2px solid ${paymentMethod === val ? COLORS.primary : borderColor}`, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                      {paymentMethod === val && <div style={{ width: 8, height: 8, borderRadius: "50%", background: COLORS.primary }} />}
-                    </div>
-                    <span style={{ color: textColor, fontSize: 14 }}>{label}</span>
-                  </div>
-                ))}
+                <h3 style={{ color: textColor, marginBottom: 4 }}>💳 Payment Method</h3>
+                {!paymentMethod && <p style={{ color: COLORS.danger, fontSize: 12, marginBottom: 12 }}>Please select a payment method to continue</p>}
+
+                <RadioOpt val="card" label="💳 Credit / Debit Card" selected={paymentMethod === "card"} onClick={() => { setPaymentMethod("card"); setCardType(""); }} />
+                <RadioOpt val="upi" label="🔷 UPI (GPay, PhonePe, Paytm, BHIM)" selected={paymentMethod === "upi"} onClick={() => setPaymentMethod("upi")} />
+                <RadioOpt val="cod" label={<span>💵 Cash on Delivery <span style={{ color: COLORS.warning, fontSize: 12, fontWeight: 700 }}>+₹15 handling fee</span></span>} selected={paymentMethod === "cod"} onClick={() => setPaymentMethod("cod")} />
+
+                {/* Card sub-section */}
                 {paymentMethod === "card" && (
-                  <div style={{ marginTop: 12 }}>
-                    <input placeholder="Card Number" style={{ width: "100%", padding: "10px 12px", borderRadius: 8, border: `1px solid ${borderColor}`, background: darkMode ? "rgba(255,255,255,0.05)" : "#fff", color: textColor, fontSize: 14, marginBottom: 8, boxSizing: "border-box", outline: "none" }} />
-                    <div style={{ display: "flex", gap: 8 }}>
-                      <input placeholder="MM/YY" style={{ flex: 1, padding: "10px 12px", borderRadius: 8, border: `1px solid ${borderColor}`, background: darkMode ? "rgba(255,255,255,0.05)" : "#fff", color: textColor, fontSize: 14, outline: "none" }} />
-                      <input placeholder="CVV" style={{ flex: 1, padding: "10px 12px", borderRadius: 8, border: `1px solid ${borderColor}`, background: darkMode ? "rgba(255,255,255,0.05)" : "#fff", color: textColor, fontSize: 14, outline: "none" }} />
+                  <div style={{ background: darkMode ? "rgba(255,255,255,0.03)" : "#F8F9FF", border: `1px solid ${borderColor}`, borderRadius: 12, padding: 16, marginTop: 4 }}>
+                    <p style={{ color: textColor, fontWeight: 600, fontSize: 13, marginBottom: 10 }}>Select Card Type</p>
+                    <div style={{ display: "flex", gap: 10, marginBottom: 14 }}>
+                      {[["credit", "💳 Credit Card"], ["debit", "🏦 Debit Card"]].map(([t, label]) => (
+                        <button key={t} onClick={() => setCardType(t)}
+                          style={{ flex: 1, padding: "9px 0", borderRadius: 8, border: `1.5px solid ${cardType === t ? COLORS.primary : borderColor}`, background: cardType === t ? "rgba(255,107,53,0.1)" : "transparent", color: cardType === t ? COLORS.primary : textColor, fontWeight: 600, cursor: "pointer", fontSize: 13 }}>
+                          {label}
+                        </button>
+                      ))}
                     </div>
+                    {cardType && (
+                      <>
+                        <p style={{ color: textColor, fontWeight: 600, fontSize: 13, marginBottom: 10 }}>
+                          {cardType === "credit" ? "Credit" : "Debit"} Card Details
+                        </p>
+                        <div style={{ marginBottom: 8 }}>
+                          <label style={{ fontSize: 11, color: mutedColor, display: "block", marginBottom: 3 }}>Name on Card *</label>
+                          <input placeholder="As printed on card" value={cardDetails.name} onChange={e => { setCardDetails(d => ({ ...d, name: e.target.value })); setCardErrors(e2 => ({ ...e2, name: "" })); }}
+                            style={{ ...inputStyle, borderColor: cardErrors.name ? COLORS.danger : borderColor }} />
+                          {cardErrors.name && <p style={errStyle}>{cardErrors.name}</p>}
+                        </div>
+                        <div style={{ marginBottom: 8 }}>
+                          <label style={{ fontSize: 11, color: mutedColor, display: "block", marginBottom: 3 }}>Card Number *</label>
+                          <input placeholder="1234 5678 9012 3456" value={cardDetails.number}
+                            onChange={e => { const v = e.target.value.replace(/\D/g, "").slice(0, 16); setCardDetails(d => ({ ...d, number: v })); setCardErrors(e2 => ({ ...e2, number: "" })); }}
+                            style={{ ...inputStyle, borderColor: cardErrors.number ? COLORS.danger : borderColor, letterSpacing: 2 }} />
+                          {cardErrors.number && <p style={errStyle}>{cardErrors.number}</p>}
+                        </div>
+                        <div style={{ display: "flex", gap: 10 }}>
+                          <div style={{ flex: 1 }}>
+                            <label style={{ fontSize: 11, color: mutedColor, display: "block", marginBottom: 3 }}>Expiry (MM/YY) *</label>
+                            <input placeholder="MM/YY" value={cardDetails.expiry}
+                              onChange={e => { let v = e.target.value.replace(/\D/g, "").slice(0, 4); if (v.length > 2) v = v.slice(0, 2) + "/" + v.slice(2); setCardDetails(d => ({ ...d, expiry: v })); setCardErrors(e2 => ({ ...e2, expiry: "" })); }}
+                              style={{ ...inputStyle, borderColor: cardErrors.expiry ? COLORS.danger : borderColor }} />
+                            {cardErrors.expiry && <p style={errStyle}>{cardErrors.expiry}</p>}
+                          </div>
+                          <div style={{ flex: 1 }}>
+                            <label style={{ fontSize: 11, color: mutedColor, display: "block", marginBottom: 3 }}>CVV *</label>
+                            <input placeholder="•••" type="password" value={cardDetails.cvv}
+                              onChange={e => { const v = e.target.value.replace(/\D/g, "").slice(0, 4); setCardDetails(d => ({ ...d, cvv: v })); setCardErrors(e2 => ({ ...e2, cvv: "" })); }}
+                              style={{ ...inputStyle, borderColor: cardErrors.cvv ? COLORS.danger : borderColor }} />
+                            {cardErrors.cvv && <p style={errStyle}>{cardErrors.cvv}</p>}
+                          </div>
+                        </div>
+                        <p style={{ color: mutedColor, fontSize: 11, marginTop: 8 }}>🔒 Your card details are encrypted and secure</p>
+                      </>
+                    )}
                   </div>
                 )}
-                <div style={{ display: "flex", gap: 10, marginTop: 16 }}>
+
+                {/* UPI sub-section */}
+                {paymentMethod === "upi" && (
+                  <div style={{ background: darkMode ? "rgba(255,255,255,0.03)" : "#F8F9FF", border: `1px solid ${borderColor}`, borderRadius: 12, padding: 16, marginTop: 4 }}>
+                    <p style={{ color: textColor, fontWeight: 600, fontSize: 13, marginBottom: 12 }}>Select UPI App</p>
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+                      {[["gpay", "🔵 Google Pay"], ["phonepe", "🟣 PhonePe"], ["paytm", "🔷 Paytm"], ["bhim", "🟠 BHIM UPI"]].map(([id, label]) => (
+                        <button key={id} onClick={() => setUpiApp(id)}
+                          style={{ padding: "10px 0", borderRadius: 8, border: `1.5px solid ${upiApp === id ? COLORS.primary : borderColor}`, background: upiApp === id ? "rgba(255,107,53,0.1)" : "transparent", color: upiApp === id ? COLORS.primary : textColor, fontWeight: 600, cursor: "pointer", fontSize: 13, transition: "all 0.15s" }}>
+                          {label}
+                        </button>
+                      ))}
+                    </div>
+                    {!upiApp && <p style={{ color: mutedColor, fontSize: 12, marginTop: 8 }}>You will be redirected to your UPI app to complete payment</p>}
+                  </div>
+                )}
+
+                {/* COD notice */}
+                {paymentMethod === "cod" && (
+                  <div style={{ background: "rgba(255,149,0,0.1)", border: `1px solid ${COLORS.warning}`, borderRadius: 10, padding: 14, marginTop: 4 }}>
+                    <p style={{ color: textColor, fontSize: 13, fontWeight: 600, marginBottom: 4 }}>📦 Cash on Delivery</p>
+                    <p style={{ color: mutedColor, fontSize: 12 }}>A handling fee of <strong style={{ color: COLORS.warning }}>₹15</strong> will be added to your order total. Please keep exact change ready at delivery.</p>
+                  </div>
+                )}
+
+                <div style={{ display: "flex", gap: 10, marginTop: 20 }}>
                   <button onClick={() => setStep(1)} style={{ background: "none", border: `1px solid ${borderColor}`, color: textColor, padding: "12px 20px", borderRadius: 10, fontWeight: 600, cursor: "pointer" }}>← Back</button>
-                  <button onClick={() => setStep(3)} style={{ flex: 1, background: COLORS.primary, color: "#fff", border: "none", padding: "12px 20px", borderRadius: 10, fontWeight: 700, cursor: "pointer" }}>Review Order →</button>
+                  <button onClick={goToReview}
+                    disabled={!paymentMethod || (paymentMethod === "card" && !cardType) || (paymentMethod === "upi" && !upiApp)}
+                    style={{ flex: 1, background: (!paymentMethod || (paymentMethod === "card" && !cardType) || (paymentMethod === "upi" && !upiApp)) ? "#ccc" : COLORS.primary, color: "#fff", border: "none", padding: "12px 20px", borderRadius: 10, fontWeight: 700, cursor: "pointer" }}>
+                    Review Order →
+                  </button>
                 </div>
               </div>
             )}
+
+            {/* ── STEP 3: REVIEW + PLACE ── */}
             {step === 3 && (
               <div>
-                <h3 style={{ color: textColor, marginBottom: 16 }}>Review & Place Order</h3>
+                <h3 style={{ color: textColor, marginBottom: 16 }}>📋 Review & Place Order</h3>
+
+                {/* Delivery summary */}
+                <div style={{ background: darkMode ? "rgba(255,255,255,0.03)" : "#F8F9FF", borderRadius: 10, padding: 12, marginBottom: 14, fontSize: 13 }}>
+                  <p style={{ color: mutedColor, marginBottom: 4, fontWeight: 600, fontSize: 11, textTransform: "uppercase" }}>Delivering to</p>
+                  <p style={{ color: textColor, fontWeight: 600 }}>{address.firstName} {address.lastName}</p>
+                  <p style={{ color: mutedColor }}>{address.address}, {address.city}, {address.state} – {address.pincode}</p>
+                  <p style={{ color: mutedColor }}>{address.phone}</p>
+                </div>
+
+                {/* Payment summary */}
+                <div style={{ background: darkMode ? "rgba(255,255,255,0.03)" : "#F8F9FF", borderRadius: 10, padding: 12, marginBottom: 14, fontSize: 13 }}>
+                  <p style={{ color: mutedColor, marginBottom: 4, fontWeight: 600, fontSize: 11, textTransform: "uppercase" }}>Payment</p>
+                  <p style={{ color: textColor }}>
+                    {paymentMethod === "card" && `${cardType === "credit" ? "💳 Credit" : "🏦 Debit"} Card ending ••••${cardDetails.number.slice(-4)}`}
+                    {paymentMethod === "upi" && `🔷 UPI – ${upiApp === "gpay" ? "Google Pay" : upiApp === "phonepe" ? "PhonePe" : upiApp === "paytm" ? "Paytm" : "BHIM UPI"}`}
+                    {paymentMethod === "cod" && "💵 Cash on Delivery (+₹15 fee)"}
+                  </p>
+                </div>
+
+                {/* Items */}
                 {cart.map((item) => (
                   <div key={item.id} style={{ display: "flex", gap: 12, padding: "10px 0", borderBottom: `1px solid ${borderColor}` }}>
-                    <span style={{ fontSize: 32 }}>{item.image}</span>
+                    <span style={{ fontSize: 30 }}>{item.image}</span>
                     <div style={{ flex: 1 }}>
                       <p style={{ color: textColor, fontSize: 13, fontWeight: 600 }}>{item.name}</p>
                       <p style={{ color: mutedColor, fontSize: 12 }}>Qty: {item.qty}</p>
@@ -926,29 +1177,66 @@ function CheckoutPage({ darkMode, cart, setCart, setPage, user, onPlaceOrder }) 
                     <span style={{ color: COLORS.primary, fontWeight: 700 }}>{fmt(item.price * item.qty)}</span>
                   </div>
                 ))}
-                <div style={{ marginTop: 16, display: "flex", gap: 10 }}>
-                  <button onClick={() => setStep(2)} style={{ background: "none", border: `1px solid ${borderColor}`, color: textColor, padding: "12px 20px", borderRadius: 10, fontWeight: 600, cursor: "pointer" }}>← Back</button>
-                  <button onClick={handlePlaceOrder} disabled={placing}
-                    style={{ flex: 1, background: placing ? "#ccc" : `linear-gradient(135deg, ${COLORS.primary}, ${COLORS.warning})`, color: "#fff", border: "none", padding: "14px 20px", borderRadius: 10, fontWeight: 800, cursor: placing ? "not-allowed" : "pointer", fontSize: 16, display: "flex", alignItems: "center", justifyContent: "center", gap: 10 }}>
-                    {placing ? <><Spinner size={18} /> Placing Order…</> : `🎉 PLACE ORDER · ${fmt(total)}`}
-                  </button>
-                </div>
+
+                {/* UPI pending state */}
+                {paymentMethod === "upi" && upiState === "waiting" && (
+                  <div style={{ marginTop: 16, background: "rgba(10,132,255,0.1)", border: `1px solid ${COLORS.info}`, borderRadius: 12, padding: 16, textAlign: "center" }}>
+                    <Spinner size={28} />
+                    <p style={{ color: textColor, fontWeight: 600, marginTop: 10 }}>Waiting for payment confirmation…</p>
+                    <p style={{ color: mutedColor, fontSize: 12, marginBottom: 14 }}>Complete the payment in your UPI app</p>
+                    <div style={{ display: "flex", gap: 10, justifyContent: "center" }}>
+                      <button onClick={() => confirmUpiPayment(true)} style={{ background: COLORS.success, color: "#fff", border: "none", padding: "10px 22px", borderRadius: 8, fontWeight: 700, cursor: "pointer", fontSize: 13 }}>✓ Payment Done</button>
+                      <button onClick={() => confirmUpiPayment(false)} style={{ background: COLORS.danger, color: "#fff", border: "none", padding: "10px 22px", borderRadius: 8, fontWeight: 700, cursor: "pointer", fontSize: 13 }}>✕ Payment Failed</button>
+                    </div>
+                  </div>
+                )}
+
+                {upiState === "redirecting" && (
+                  <div style={{ marginTop: 16, textAlign: "center", padding: 16 }}>
+                    <Spinner size={28} />
+                    <p style={{ color: textColor, marginTop: 10 }}>Opening your UPI app…</p>
+                  </div>
+                )}
+
+                {(upiState === "idle" || upiState !== "waiting" && upiState !== "redirecting") && (
+                  <div style={{ marginTop: 16, display: "flex", gap: 10 }}>
+                    <button onClick={() => setStep(2)} style={{ background: "none", border: `1px solid ${borderColor}`, color: textColor, padding: "12px 20px", borderRadius: 10, fontWeight: 600, cursor: "pointer" }}>← Back</button>
+                    <button onClick={() => handlePlaceOrder(false)} disabled={placing}
+                      style={{ flex: 1, background: placing ? "#ccc" : `linear-gradient(135deg, ${COLORS.primary}, ${COLORS.warning})`, color: "#fff", border: "none", padding: "14px 20px", borderRadius: 10, fontWeight: 800, cursor: placing ? "not-allowed" : "pointer", fontSize: 15, display: "flex", alignItems: "center", justifyContent: "center", gap: 10 }}>
+                      {placing ? <><Spinner size={18} /> Placing…</> : paymentMethod === "upi" ? `🔷 Pay ${fmt(total)} via UPI` : paymentMethod === "cod" ? `📦 Place Order · ${fmt(total)}` : `💳 Pay ${fmt(total)}`}
+                    </button>
+                  </div>
+                )}
               </div>
             )}
           </div>
 
+          {/* Order summary sidebar */}
           <div style={{ background: cardBg, border: `1px solid ${borderColor}`, borderRadius: 14, padding: 16, height: "fit-content" }}>
-            <h4 style={{ color: textColor, marginBottom: 12 }}>Order ({cart.length} items)</h4>
+            <h4 style={{ color: textColor, marginBottom: 12, fontWeight: 700 }}>Order ({cart.length} items)</h4>
             {cart.map((i) => (
               <div key={i.id} style={{ display: "flex", justifyContent: "space-between", marginBottom: 8, fontSize: 13 }}>
-                <span style={{ color: mutedColor, flex: 1 }}>{i.name.slice(0, 22)}...</span>
-                <span style={{ color: textColor, fontWeight: 600 }}>{fmt(i.price * i.qty)}</span>
+                <span style={{ color: mutedColor, flex: 1, marginRight: 8, lineHeight: 1.3 }}>{i.name.slice(0, 22)}…</span>
+                <span style={{ color: textColor, fontWeight: 600, flexShrink: 0 }}>{fmt(i.price * i.qty)}</span>
               </div>
             ))}
-            <div style={{ borderTop: `1px solid ${borderColor}`, paddingTop: 10, marginTop: 8, display: "flex", justifyContent: "space-between" }}>
-              <span style={{ color: textColor, fontWeight: 700 }}>Total</span>
-              <span style={{ color: COLORS.primary, fontWeight: 800 }}>{fmt(total)}</span>
+            <div style={{ borderTop: `1px solid ${borderColor}`, paddingTop: 10, marginTop: 8 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6, fontSize: 13 }}>
+                <span style={{ color: mutedColor }}>Subtotal</span>
+                <span style={{ color: textColor }}>{fmt(subtotal)}</span>
+              </div>
+              {paymentMethod === "cod" && (
+                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6, fontSize: 13 }}>
+                  <span style={{ color: COLORS.warning }}>COD Fee</span>
+                  <span style={{ color: COLORS.warning, fontWeight: 600 }}>+₹15</span>
+                </div>
+              )}
+              <div style={{ display: "flex", justifyContent: "space-between", borderTop: `1px solid ${borderColor}`, paddingTop: 8, marginTop: 4 }}>
+                <span style={{ color: textColor, fontWeight: 700 }}>Total</span>
+                <span style={{ color: COLORS.primary, fontWeight: 800, fontSize: 16 }}>{fmt(total)}</span>
+              </div>
             </div>
+            <p style={{ color: mutedColor, fontSize: 11, marginTop: 12, textAlign: "center" }}>🔒 Secure checkout · SSL encrypted</p>
           </div>
         </div>
       </div>
