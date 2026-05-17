@@ -841,6 +841,55 @@ function CartPage({ darkMode, cart, setCart, setPage }) {
   );
 }
 
+// ── Checkout helpers — defined at module level so React never remounts them on re-render ──
+
+function StepDot({ n, step, textColor, mutedColor, borderColor }) {
+  const done = n < step;
+  const active = n === step;
+  const bg = n <= step ? COLORS.primary : borderColor;
+  return (
+    <div style={{ display: "flex", alignItems: "center", flex: 1 }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+        <div style={{ width: 28, height: 28, borderRadius: "50%", background: bg, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 700 }}>
+          {done ? "✓" : n}
+        </div>
+        <span style={{ fontSize: 13, color: n <= step ? textColor : mutedColor, fontWeight: active ? 700 : 400 }}>
+          {n === 1 ? "Delivery" : n === 2 ? "Payment" : "Review"}
+        </span>
+      </div>
+      {n < 3 && <div style={{ flex: 1, height: 1.5, background: n < step ? COLORS.primary : borderColor, margin: "0 10px" }} />}
+    </div>
+  );
+}
+
+function AddressField({ label, fkey, type, half, error, value, onChange, inputStyle, mutedColor, borderColor }) {
+  return (
+    <div style={{ gridColumn: half ? "auto" : "1 / -1" }}>
+      <label style={{ fontSize: 12, color: error ? COLORS.danger : mutedColor, display: "block", marginBottom: 4 }}>
+        {label} <span style={{ color: COLORS.danger }}>*</span>
+      </label>
+      <input
+        type={type || "text"}
+        value={value}
+        onChange={onChange}
+        style={{ ...inputStyle, borderColor: error ? COLORS.danger : borderColor }}
+      />
+      {error && <p style={{ color: COLORS.danger, fontSize: 11, marginTop: 3 }}>{error}</p>}
+    </div>
+  );
+}
+
+function RadioOpt({ label, selected, onClick, borderColor, textColor }) {
+  return (
+    <div onClick={onClick} style={{ border: `1.5px solid ${selected ? COLORS.primary : borderColor}`, borderRadius: 10, padding: "12px 16px", marginBottom: 10, cursor: "pointer", display: "flex", alignItems: "center", gap: 10, background: selected ? "rgba(255,107,53,0.05)" : "transparent", transition: "all 0.15s" }}>
+      <div style={{ width: 18, height: 18, borderRadius: "50%", border: `2px solid ${selected ? COLORS.primary : borderColor}`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+        {selected && <div style={{ width: 8, height: 8, borderRadius: "50%", background: COLORS.primary }} />}
+      </div>
+      <span style={{ color: textColor, fontSize: 14 }}>{label}</span>
+    </div>
+  );
+}
+
 function CheckoutPage({ darkMode, cart, setCart, setPage, user, onPlaceOrder }) {
   const [step, setStep] = useState(1);
   const [paymentMethod, setPaymentMethod] = useState("");       // "", "card", "upi", "cod"
@@ -982,33 +1031,6 @@ function CheckoutPage({ darkMode, cart, setCart, setPage, user, onPlaceOrder }) 
     </div>
   );
 
-  const StepDot = ({ n, label }) => (
-    <div style={{ display: "flex", alignItems: "center", flex: 1 }}>
-      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-        <div style={{ width: 28, height: 28, borderRadius: "50%", background: n <= step ? COLORS.primary : borderColor, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 700 }}>{n < step ? "✓" : n}</div>
-        <span style={{ fontSize: 13, color: n <= step ? textColor : mutedColor, fontWeight: n === step ? 700 : 400 }}>{label}</span>
-      </div>
-      {n < 3 && <div style={{ flex: 1, height: 1.5, background: n < step ? COLORS.primary : borderColor, margin: "0 10px" }} />}
-    </div>
-  );
-
-  const Field = ({ label, fkey, type = "text", half, error }) => (
-    <div style={{ gridColumn: half ? "auto" : "1 / -1" }}>
-      <label style={{ fontSize: 12, color: error ? COLORS.danger : mutedColor, display: "block", marginBottom: 4 }}>{label}{" "}<span style={{ color: COLORS.danger }}>*</span></label>
-      <input type={type} value={address[fkey]} onChange={(e) => { setAddress(a => ({ ...a, [fkey]: e.target.value })); setAddrErrors(e => ({ ...e, [fkey]: "" })); }}
-        style={{ ...inputStyle, borderColor: error ? COLORS.danger : borderColor }} />
-      {error && <p style={errStyle}>{error}</p>}
-    </div>
-  );
-
-  const RadioOpt = ({ val, label, selected, onClick }) => (
-    <div onClick={onClick} style={{ border: `1.5px solid ${selected ? COLORS.primary : borderColor}`, borderRadius: 10, padding: "12px 16px", marginBottom: 10, cursor: "pointer", display: "flex", alignItems: "center", gap: 10, background: selected ? "rgba(255,107,53,0.05)" : "transparent", transition: "all 0.15s" }}>
-      <div style={{ width: 18, height: 18, borderRadius: "50%", border: `2px solid ${selected ? COLORS.primary : borderColor}`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-        {selected && <div style={{ width: 8, height: 8, borderRadius: "50%", background: COLORS.primary }} />}
-      </div>
-      <span style={{ color: textColor, fontSize: 14 }}>{label}</span>
-    </div>
-  );
 
   return (
     <div style={{ background: bg, minHeight: "100vh", padding: 20 }}>
@@ -1017,9 +1039,9 @@ function CheckoutPage({ darkMode, cart, setCart, setPage, user, onPlaceOrder }) 
 
         {/* Step indicator */}
         <div style={{ display: "flex", alignItems: "center", marginBottom: 28 }}>
-          <StepDot n={1} label="Delivery" />
-          <StepDot n={2} label="Payment" />
-          <StepDot n={3} label="Review" />
+          <StepDot n={1} step={step} textColor={textColor} mutedColor={mutedColor} borderColor={borderColor} />
+          <StepDot n={2} step={step} textColor={textColor} mutedColor={mutedColor} borderColor={borderColor} />
+          <StepDot n={3} step={step} textColor={textColor} mutedColor={mutedColor} borderColor={borderColor} />
         </div>
 
         <div style={{ display: "grid", gridTemplateColumns: "1fr 300px", gap: 20 }}>
@@ -1030,14 +1052,34 @@ function CheckoutPage({ darkMode, cart, setCart, setPage, user, onPlaceOrder }) 
               <div>
                 <h3 style={{ color: textColor, marginBottom: 16 }}>📍 Delivery Address</h3>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-                  <Field label="First Name" fkey="firstName" half error={addrErrors.firstName} />
-                  <Field label="Last Name" fkey="lastName" half error={addrErrors.lastName} />
-                  <Field label="Email" fkey="email" type="email" half error={addrErrors.email} />
-                  <Field label="Phone" fkey="phone" type="tel" half error={addrErrors.phone} />
-                  <Field label="Address" fkey="address" error={addrErrors.address} />
-                  <Field label="City" fkey="city" half error={addrErrors.city} />
-                  <Field label="State" fkey="state" half error={addrErrors.state} />
-                  <Field label="Pincode" fkey="pincode" half error={addrErrors.pincode} />
+                  {[
+                    ["First Name", "firstName", "text", true],
+                    ["Last Name",  "lastName",  "text", true],
+                    ["Email",      "email",      "email", true],
+                    ["Phone",      "phone",      "tel",   true],
+                    ["Address",    "address",    "text",  false],
+                    ["City",       "city",       "text",  true],
+                    ["State",      "state",      "text",  true],
+                    ["Pincode",    "pincode",    "text",  true],
+                  ].map(([label, fkey, type, half]) => (
+                    <AddressField
+                      key={fkey}
+                      label={label}
+                      fkey={fkey}
+                      type={type}
+                      half={half}
+                      error={addrErrors[fkey]}
+                      value={address[fkey]}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setAddress(a => ({ ...a, [fkey]: val }));
+                        setAddrErrors(err => ({ ...err, [fkey]: "" }));
+                      }}
+                      inputStyle={inputStyle}
+                      mutedColor={mutedColor}
+                      borderColor={borderColor}
+                    />
+                  ))}
                 </div>
                 <button onClick={goToPayment}
                   style={{ marginTop: 20, background: COLORS.primary, color: "#fff", border: "none", padding: "12px 32px", borderRadius: 10, fontWeight: 700, cursor: "pointer", fontSize: 15 }}>
@@ -1052,9 +1094,9 @@ function CheckoutPage({ darkMode, cart, setCart, setPage, user, onPlaceOrder }) 
                 <h3 style={{ color: textColor, marginBottom: 4 }}>💳 Payment Method</h3>
                 {!paymentMethod && <p style={{ color: COLORS.danger, fontSize: 12, marginBottom: 12 }}>Please select a payment method to continue</p>}
 
-                <RadioOpt val="card" label="💳 Credit / Debit Card" selected={paymentMethod === "card"} onClick={() => { setPaymentMethod("card"); setCardType(""); }} />
-                <RadioOpt val="upi" label="🔷 UPI (GPay, PhonePe, Paytm, BHIM)" selected={paymentMethod === "upi"} onClick={() => setPaymentMethod("upi")} />
-                <RadioOpt val="cod" label={<span>💵 Cash on Delivery <span style={{ color: COLORS.warning, fontSize: 12, fontWeight: 700 }}>+₹15 handling fee</span></span>} selected={paymentMethod === "cod"} onClick={() => setPaymentMethod("cod")} />
+                <RadioOpt label="💳 Credit / Debit Card" selected={paymentMethod === "card"} onClick={() => { setPaymentMethod("card"); setCardType(""); }} borderColor={borderColor} textColor={textColor} />
+                <RadioOpt label={<span>🔷 UPI (GPay, PhonePe, Paytm, BHIM)</span>} selected={paymentMethod === "upi"} onClick={() => setPaymentMethod("upi")} borderColor={borderColor} textColor={textColor} />
+                <RadioOpt label={<span>💵 Cash on Delivery <span style={{ color: COLORS.warning, fontSize: 12, fontWeight: 700 }}>+₹15 handling fee</span></span>} selected={paymentMethod === "cod"} onClick={() => setPaymentMethod("cod")} borderColor={borderColor} textColor={textColor} />
 
                 {/* Card sub-section */}
                 {paymentMethod === "card" && (
